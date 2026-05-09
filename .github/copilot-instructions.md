@@ -36,5 +36,5 @@ description: Project guidelines for Cosmos DB Document Management Service ASP.NE
 - Prefer strongly typed models/configurations wherever possible.
 - Follow secure coding practices and validate all external inputs.
 
-Goal:
+## Goal:
 The application should allow users to connect to any Azure Cosmos DB instance and perform generic document operations through a user-friendly interface without modifying code.
