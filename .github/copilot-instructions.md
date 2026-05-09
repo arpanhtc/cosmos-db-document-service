@@ -29,12 +29,10 @@ description: Project guidelines for Cosmos DB Document Management Service ASP.NE
 - Ensure scalability and performance considerations are included.
 - Add retry handling for transient external/service failures.
 - Prefer built-in .NET features and standard libraries before adding third-party packages.
-- Include Swagger/OpenAPI support for APIs when applicable.
-- Generate sample requests/responses for APIs or services.
-- Add README documentation with setup and usage instructions.
+<!-- - Include Swagger/OpenAPI support for APIs when applicable. -->
 - Write code in a way that supports future extensibility and unit testing.
-- Prefer strongly typed models/configurations wherever possible.
-- Follow secure coding practices and validate all external inputs.
+<!-- - Prefer strongly typed models/configurations wherever possible. -->
+<!-- - Follow secure coding practices and validate all external inputs. -->
 
 ## Goal:
 The application should allow users to connect to any Azure Cosmos DB instance and perform generic document operations through a user-friendly interface without modifying code.
