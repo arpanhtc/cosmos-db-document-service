@@ -5,7 +5,7 @@ description: Project guidelines for Cosmos DB Document Management Service ASP.NE
 
 # Development Guidelines
 
-Architecture & Engineering Standards:
+## Architecture & Engineering Standards:
 
 - Use Clean Architecture principles.
 - Follow SOLID principles.
