@@ -8,7 +8,6 @@ description: Project guidelines for Cosmos DB Document Management Service ASP.NE
 ## Architecture & Engineering Standards:
 
 - Use Clean Architecture principles.
-- Follow SOLID principles.
 - Use Dependency Injection throughout the application.
 - Keep UI, business logic, and data access layers separated.
 - Prefer reusable and generic implementations over hardcoded logic.
@@ -22,17 +21,19 @@ description: Project guidelines for Cosmos DB Document Management Service ASP.NE
 - Do not hardcode secrets, connection strings, or environment-specific values.
 - Prefer configuration-driven and extensible design.
 - Follow RESTful conventions for APIs when applicable.
-- Use DTOs/models instead of exposing internal entities directly.
 - Add comments only where necessary; avoid unnecessary verbose comments.
 - Write clean and readable code with proper folder structure.
 - Use interfaces for services and repositories.
-- Ensure scalability and performance considerations are included.
-- Add retry handling for transient external/service failures.
 - Prefer built-in .NET features and standard libraries before adding third-party packages.
-<!-- - Include Swagger/OpenAPI support for APIs when applicable. -->
+<!--  
+- Follow SOLID principles.
 - Write code in a way that supports future extensibility and unit testing.
-<!-- - Prefer strongly typed models/configurations wherever possible. -->
-<!-- - Follow secure coding practices and validate all external inputs. -->
+- Add retry handling for transient external/service failures.
+- Ensure scalability and performance considerations are included.
+- Use DTOs/models instead of exposing internal entities directly.
+- Include Swagger/OpenAPI support for APIs when applicable.
+- Prefer strongly typed models/configurations wherever possible.
+- Follow secure coding practices and validate all external inputs. -->
 
 ## Goal:
 The application should allow users to connect to any Azure Cosmos DB instance and perform generic document operations through a user-friendly interface without modifying code.
