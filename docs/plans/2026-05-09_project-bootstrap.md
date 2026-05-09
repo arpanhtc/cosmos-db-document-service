@@ -26,7 +26,8 @@ Build a layered ASP.NET Core 10 application for managing JSON documents in Azure
    - `Utilities/` or `Helpers/` — validation helpers, JSON utilities
 
 3. Update `appsettings.json` and `appsettings.Development.json`:
-   - Add `CosmosDb` section with: `ConnectionString`, `DatabaseName`, `ContainerName`, `PartitionKeyPath`
+   - Add `CosmosDb` section with: `ConnectionString` (required, not editable at runtime), `PartitionKeyPath` (default: '/pk', not editable at runtime)
+   - DatabaseName and ContainerName should have optional defaults but will be user-editable via UI at runtime
    - Add `Logging` settings for structured logging
    - Add feature flags for UI options
 
@@ -60,6 +61,7 @@ Build a layered ASP.NET Core 10 application for managing JSON documents in Azure
    - `OperationResult.cs` — result of any Cosmos DB operation (success, error message, affected data, **cosmosDbDiagnostics**)
    - `CosmosDbDiagnostics.cs` — **NEW** - includes RequestCharge (RU), ActivityId, StatusCode, RetryCount, RetryAfter
    - `CosmosDbConnectionInfo.cs` — configuration DTO for connection details
+   - `CosmosDbConfigurationRequest.cs` — DTO for configuration form submission
 
 3. Create enums for operations:
    - `PatchOperationType.cs` — Add, Replace, Remove, Set, Increment, etc. (Cosmos DB Patch operations)
@@ -109,27 +111,27 @@ Build a layered ASP.NET Core 10 application for managing JSON documents in Azure
 *Manages runtime Cosmos DB configuration without code changes.*
 
 1. Implement `ConfigurationService`:
-   - Read Cosmos DB settings from `appsettings.json` (IConfiguration)
-   - Support runtime updates to connection string, database, container, partition key path
-   - Default partition key path: `/pk` (configurable in appsettings)
-   - Validate configuration on initialization
-   - Expose properties: `ConnectionString`, `DatabaseName`, `ContainerName`, `PartitionKeyPath`
+   - Read Cosmos DB settings from `appsettings.json` (IConfiguration): ConnectionString, PartitionKeyPath (read-only)
+   - Support runtime updates to: DatabaseName and ContainerName only (via UI)
+   - Default partition key path: `/pk` (configured in appsettings, read-only)
+   - Validate configuration on initialization and on updates
+   - Expose properties: `ConnectionString` (read-only), `DatabaseName` (editable), `ContainerName` (editable), `PartitionKeyPath` (read-only)
 
 2. Implement `IConfigurationService` interface with:
-   - `GetConfigurationAsync()` — retrieves current settings
-   - `UpdateConfigurationAsync(connectionInfo)` — updates settings at runtime
-   - `ValidateConfigurationAsync()` — checks if connection is valid
-   - `GetPartitionKeyPath()` — returns configured partition key path (default '/pk')
+   - `GetConfigurationAsync()` — retrieves current settings (all properties)
+   - `UpdateConfigurationAsync(databaseName, containerName)` — updates DatabaseName and ContainerName at runtime (connection string and partition key path are read-only from appsettings)
+   - `ValidateConfigurationAsync()` — checks if connection is valid with current configuration
+   - `GetPartitionKeyPath()` — returns configured partition key path from appsettings (default '/pk')
 
 3. Add configuration validation:
-   - Connection string format validation
-   - Ensure database name and container name are non-empty
-   - Validate partition key path format (should be valid JSON path like '/pk' or '/customer/id')
+   - Ensure DatabaseName and ContainerName are non-empty when updated at runtime
+   - Connection string format and partition key path are validated only on initial load from appsettings
 
 **Dependencies:** Depends on Phase 3 (interfaces)  
 **Verification:**
-- [ ] Service correctly reads from appsettings
-- [ ] Runtime updates work without restart
+- [ ] Service correctly reads ConnectionString and PartitionKeyPath from appsettings (read-only)
+- [ ] Runtime updates work for DatabaseName and ContainerName without restart
+- [ ] DatabaseName and ContainerName changes persist in session
 - [ ] Configuration errors are clear and actionable
 - [ ] Can be injected into controllers/services
 
@@ -139,9 +141,9 @@ Build a layered ASP.NET Core 10 application for managing JSON documents in Azure
 *Implements low-level Cosmos DB SDK integration.*
 
 1. Implement `CosmosDbService`:
-   - Initialize `CosmosClient` from connection string
-   - Lazy-load database and container references
-   - Health check: test connection to Cosmos DB
+   - Initialize `CosmosClient` from connection string (from appsettings via ConfigurationService)
+   - Lazy-load database and container references (using ConfigurationService to get current DatabaseName/ContainerName)
+   - Health check: test connection to Cosmos DB using current configuration
    - Dispose pattern for `CosmosClient`
    - Handle transient failures with appropriate error messages
 
@@ -232,22 +234,27 @@ Build a layered ASP.NET Core 10 application for managing JSON documents in Azure
 *Creates REST-like endpoints and connects UI to services.*
 
 1. Create API controllers (or extend HomeController):
+   - `HomeController.cs`:
+     - `Index()` — show configuration UI form with fields for Database Name and Container Name only (Connection String and Partition Key Path are read from appsettings)
+     - `POST Configure()` — receives form submission with Database Name and Container Name; updates configuration and tests connection
+     - `ValidateConfiguration()` — AJAX endpoint to test current configuration without form submission
    - `DocumentsController.cs`:
      - `POST /documents/insert` — create new document (id, **optional** partitionKeyValue, jsonPayload)
      - `POST /documents/upsert` — insert or replace (id, **optional** partitionKeyValue, jsonPayload)
      - `GET /documents/{id}` — retrieve document (id, **optional** partitionKeyValue)
      - `POST /documents/{id}/patch` — apply patch operations (id, **optional** partitionKeyValue, operations)
      - `DELETE /documents/{id}` — delete document (id, **optional** partitionKeyValue)
-     - `POST /documents/configure` — update Cosmos DB settings
    - All endpoints return JSON with standardized response format
    - Responses include Cosmos DB diagnostics (RequestCharge, ActivityId, StatusCode, etc.)
 
-2. Update `HomeController`:
-   - `Index()` — show configuration UI
-   - `ConfigureCosmos()` — test connection with provided settings
-
 3. Create views for UI:
-   - `Index.cshtml` — configuration panel (connection string, database, container, partition key path)
+   - `Index.cshtml` — configuration panel with:
+     - Connection String display (read-only, from appsettings)
+     - Partition Key Path display (read-only, from appsettings, default: '/pk')
+     - Database Name (text input, required, editable, shows current value in session)
+     - Container Name (text input, required, editable, shows current value in session)
+     - "Test Connection" button to validate settings and show success/failure
+     - Display current configuration status
    - `Insert.cshtml` — form to insert JSON document (id, **optional** partition key field, JSON payload)
      - Help text: "If partition key not provided, will extract from JSON using path '/pk'"
    - `Upsert.cshtml` — form to upsert document (same as Insert)
@@ -263,9 +270,15 @@ Build a layered ASP.NET Core 10 application for managing JSON documents in Azure
    - Catch domain exceptions and return `BadRequest()` or `InternalServerError()`
    - Include user-friendly error message + Cosmos DB diagnostics in response
    - Log all errors server-side with full context
+   - When DatabaseName or ContainerName is invalid, display error on configuration form
+   - Connection string and partition key path errors are shown at startup (non-editable, from appsettings)
 
 **Dependencies:** Depends on Phase 6 (DocumentService, PatchOperationService)  
 **Verification:**
+- [ ] Configuration form shows DatabaseName and ContainerName as editable input fields
+- [ ] Connection String and Partition Key Path are displayed as read-only (from appsettings)
+- [ ] DatabaseName and ContainerName inputs are editable and update configuration in session
+- [ ] Test Connection button works and shows success/failure
 - [ ] All endpoints are callable (test with Postman or browser)
 - [ ] Endpoints return correct HTTP status codes (200, 400, 404, 500)
 - [ ] Error responses are consistent and informative
@@ -278,7 +291,11 @@ Build a layered ASP.NET Core 10 application for managing JSON documents in Azure
 *Finishes UI, improves UX, and adds user-facing features.*
 
 1. Enhance views with Bootstrap styling:
-   - Configuration panel: styled input fields, test connection button
+   - Configuration panel: styled display for read-only fields and input fields for editable settings, test connection button with loading state
+     - Connection String: read-only display (from appsettings)
+     - Partition Key Path: read-only display (from appsettings, default '/pk')
+     - Database Name: regular text input, editable
+     - Container Name: regular text input, editable
    - Document operations: tabbed or multi-step forms
    - Results: formatted JSON display, copy-to-clipboard buttons
    - Error messages: styled alert boxes with context
@@ -292,21 +309,27 @@ Build a layered ASP.NET Core 10 application for managing JSON documents in Azure
    - Copy-to-clipboard for ActivityId (for support reference)
 
 3. Implement session state:
-   - Remember last Cosmos DB configuration in session
-   - Pre-populate forms with common defaults
-   - Remember last used partition key path
+   - Remember last Cosmos DB configuration in session (Database Name, Container Name)
+   - Pre-populate configuration form with current session values (DatabaseName, ContainerName)
+   - Connection String and Partition Key Path loaded from appsettings on each session
+   - Show validation status indicator on configuration panel
 
 4. Add README and documentation:
-   - Setup instructions (how to get Cosmos DB connection string)
+   - Setup instructions (how to get Cosmos DB connection string, partition key path)
    - Usage guide (how to use each feature)
-   - Configuration reference (appsettings format)
-   - Partition key extraction explanation (default '/pk', can be customized)
+   - Configuration reference (appsettings format for ConnectionString, PartitionKeyPath)
+   - UI Configuration Guide (how to enter/update Database Name and Container Name at runtime)
+   - Partition key extraction explanation (default '/pk', configured in appsettings)
    - Understanding Cosmos DB diagnostics (RequestCharge, ActivityId, etc.)
    - Troubleshooting section
 
 **Dependencies:** Depends on Phase 7 (API Controllers, Views)  
 **Verification:**
 - [ ] All views render without errors
+- [ ] Configuration panel displays Connection String and Partition Key Path as read-only (from appsettings)
+- [ ] Configuration panel displays DatabaseName and ContainerName as editable input fields
+- [ ] DatabaseName and ContainerName fields are editable and accept user input
+- [ ] Form updates work and persist in session
 - [ ] Forms are responsive (mobile-friendly)
 - [ ] Error messages display clearly with diagnostic info
 - [ ] Operations complete and show results with diagnostics
@@ -320,10 +343,11 @@ Build a layered ASP.NET Core 10 application for managing JSON documents in Azure
 ### **To Create/Modify:**
 
 **Configuration:**
-- `appsettings.json` — add CosmosDb section with ConnectionString, DatabaseName, ContainerName, **PartitionKeyPath** (default: '/pk')
+- `appsettings.json` — add CosmosDb section with ConnectionString (required, read-only), PartitionKeyPath (default: '/pk', read-only)
 
 **Program.cs:**
 - Register all services (ConfigurationService, CosmosDbService, DocumentService, PatchOperationService, PartitionKeyExtractor, repositories)
+- Load ConnectionString and PartitionKeyPath from appsettings
 - Configure logging
 - Configure DI container
 
@@ -383,7 +407,9 @@ Build a layered ASP.NET Core 10 application for managing JSON documents in Azure
 ### **Included**
 - Full CRUD operations (Insert, Get/Retrieve, Upsert, Patch, Delete)
 - Dynamic JSON document support (schema-independent)
-- Runtime configuration (change connection without code)
+- Runtime configuration with UI inputs for DatabaseName and ContainerName only
+- ConnectionString and PartitionKeyPath read from appsettings (not user-editable)
+- User-configurable DatabaseName and ContainerName on the fly without code changes
 - Cosmos DB Patch operations (all types supported by SDK)
 - User-friendly error handling and validation
 - Bootstrap-based responsive UI
@@ -445,3 +471,12 @@ Matches current template, simpler for admin tool use case.
   - If partition key path doesn't exist in payload and no user input: validation error "Partition key not found and not provided"
   - If partition key extraction fails: clear error message with the expected path
   - User can override the extracted value via form input
+
+---
+
+### **Decision 4: Configuration Updates ✅ APPROVED**
+**Choice:** Support runtime updates to all settings: connection string, database name, container name, partition key path
+
+**Implementation Details:**
+- Store current configuration in session or in-memory cache (users can change at runtime via UI)
+- Allow all properties to be updated via `UpdateConfigurationAsync()` method
