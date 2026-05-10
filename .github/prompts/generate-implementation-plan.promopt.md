@@ -177,3 +177,9 @@ Avoid:
 - unnecessary repetition
 
 ---
+
+# Output Delivery
+
+Generate the output as downloadable markdown files only; do not render full document contents in the chat/UI response.
+
+---
