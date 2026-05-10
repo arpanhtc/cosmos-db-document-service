@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CosmosDbManager.Application/CosmosDbManager.Application.csproj" />
+    <Project Path="src/CosmosDbManager.Domain/CosmosDbManager.Domain.csproj" />
+    <Project Path="src/CosmosDbManager.Infrastructure/CosmosDbManager.Infrastructure.csproj" />
+    <Project Path="src/CosmosDbManager.Web/CosmosDbManager.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CosmosDbManager.Application.Tests/CosmosDbManager.Application.Tests.csproj" />
+    <Project Path="tests/CosmosDbManager.Infrastructure.Tests/CosmosDbManager.Infrastructure.Tests.csproj" />
+  </Folder>
+</Solution>
