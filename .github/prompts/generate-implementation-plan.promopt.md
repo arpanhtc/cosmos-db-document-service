@@ -1,6 +1,6 @@
 
 ---
-name: AI Implementation Document Generator
+name: generate-implementation
 description: Generates implementation plan documents based on provided plan file.
 ---
 
