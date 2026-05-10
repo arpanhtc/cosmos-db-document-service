@@ -1,7 +1,7 @@
 
 ---
 name: generate-implementation
-description: Generates implementation plan documents based on provided plan file.
+description: Generates implementation plan documents based on provided plan file for .NET project.
 ---
 
 # AI Implementation Document Generator
