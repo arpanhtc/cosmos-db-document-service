@@ -8,5 +8,6 @@
   <Folder Name="/tests/">
     <Project Path="tests/CosmosDbManager.Application.Tests/CosmosDbManager.Application.Tests.csproj" />
     <Project Path="tests/CosmosDbManager.Infrastructure.Tests/CosmosDbManager.Infrastructure.Tests.csproj" />
+    <Project Path="tests/CosmosDbManager.Web.Tests/CosmosDbManager.Web.Tests.csproj" />
   </Folder>
 </Solution>

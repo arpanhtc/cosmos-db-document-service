@@ -1,0 +1,38 @@
+@model GetDocumentViewModel
+@{
+    ViewData["Title"] = "Get Document";
+}
+
+<section class="page-header">
+    <p class="eyebrow">Document workflow</p>
+    <h1>Get document</h1>
+    <p class="lead">Fetch a stored document by id and partition key.</p>
+</section>
+
+<form asp-action="Get" method="post" class="stack-form">
+    @Html.AntiForgeryToken()
+    <partial name="_ValidationSummary" />
+    <partial name="_ConfigurationPanel" model="Model" />
+
+    <section class="config-panel">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="Id" class="form-label"></label>
+                <input asp-for="Id" class="form-control" />
+                <span asp-validation-for="Id" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="PartitionKeyValue" class="form-label"></label>
+                <input asp-for="PartitionKeyValue" class="form-control" />
+                <span asp-validation-for="PartitionKeyValue" class="text-danger small"></span>
+            </div>
+        </div>
+    </section>
+
+    <div class="d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primary">Get Document</button>
+        <a class="btn btn-outline-secondary" asp-controller="Document" asp-action="Patch">Go to Patch</a>
+    </div>
+</form>
+
+<partial name="_OperationResult" model="Model.Result" />

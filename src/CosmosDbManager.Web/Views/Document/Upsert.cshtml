@@ -1,0 +1,43 @@
+@model UpsertDocumentViewModel
+@{
+    ViewData["Title"] = "Upsert Document";
+}
+
+<section class="page-header">
+    <p class="eyebrow">Document workflow</p>
+    <h1>Upsert document</h1>
+    <p class="lead">Insert a document when it is missing or replace it when it already exists.</p>
+</section>
+
+<form asp-action="Upsert" method="post" class="stack-form">
+    @Html.AntiForgeryToken()
+    <partial name="_ValidationSummary" />
+    <partial name="_ConfigurationPanel" model="Model" />
+
+    <section class="config-panel">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="Id" class="form-label"></label>
+                <input asp-for="Id" class="form-control" />
+                <span asp-validation-for="Id" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="PartitionKeyValue" class="form-label"></label>
+                <input asp-for="PartitionKeyValue" class="form-control" />
+                <span asp-validation-for="PartitionKeyValue" class="text-danger small"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="JsonPayload" class="form-label"></label>
+                <textarea asp-for="JsonPayload" class="form-control json-editor" rows="14" data-json-editor></textarea>
+                <span asp-validation-for="JsonPayload" class="text-danger small"></span>
+            </div>
+        </div>
+    </section>
+
+    <div class="d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primary">Upsert Document</button>
+        <a class="btn btn-outline-secondary" asp-controller="Document" asp-action="Insert">Use Insert Instead</a>
+    </div>
+</form>
+
+<partial name="_OperationResult" model="Model.Result" />

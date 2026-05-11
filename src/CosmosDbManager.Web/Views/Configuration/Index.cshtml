@@ -1,0 +1,43 @@
+@model ConfigurationViewModel
+@{
+    ViewData["Title"] = "Configuration";
+}
+
+<section class="page-header">
+    <p class="eyebrow">Configuration</p>
+    <h1>Store Cosmos DB settings in session</h1>
+    <p class="lead">Save connection details once and reuse them on every document page.</p>
+</section>
+
+<form asp-action="Index" method="post" class="stack-form">
+    @Html.AntiForgeryToken()
+    <partial name="_ValidationSummary" />
+    <section class="config-panel">
+        <div class="row g-3">
+            <div class="col-12">
+                <label asp-for="ConnectionString" class="form-label"></label>
+                <input asp-for="ConnectionString" class="form-control" />
+                <span asp-validation-for="ConnectionString" class="text-danger small"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="DatabaseName" class="form-label"></label>
+                <input asp-for="DatabaseName" class="form-control" />
+                <span asp-validation-for="DatabaseName" class="text-danger small"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="ContainerName" class="form-label"></label>
+                <input asp-for="ContainerName" class="form-control" />
+                <span asp-validation-for="ContainerName" class="text-danger small"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="PartitionKey" class="form-label"></label>
+                <input asp-for="PartitionKey" class="form-control" />
+                <span asp-validation-for="PartitionKey" class="text-danger small"></span>
+            </div>
+        </div>
+    </section>
+    <div class="d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primary">Save to Session</button>
+        <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">Back to Home</a>
+    </div>
+</form>

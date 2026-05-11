@@ -35,12 +35,15 @@ public sealed class DocumentService : IDocumentService
         _logger = logger;
     }
 
+    /// <summary>
+    /// Creates a new document in Cosmos DB.
+    /// </summary>
     public async Task<OperationResult<DocumentResponse>> InsertAsync(InsertDocumentRequest request, CancellationToken ct = default)
     {
-        var validationResult = await _insertValidator.ValidateAsync(request, ct);
-        if (!validationResult.IsValid)
+        var validationResult = await ValidateRequestAsync(_insertValidator, request, ct);
+        if (validationResult != null)
         {
-            return ValidationFailure(validationResult.Errors.Select(x => x.ErrorMessage));
+            return validationResult;
         }
 
         try
@@ -59,12 +62,15 @@ public sealed class DocumentService : IDocumentService
         }
     }
 
+    /// <summary>
+    /// Creates or updates a document in Cosmos DB.
+    /// </summary>
     public async Task<OperationResult<DocumentResponse>> UpsertAsync(UpsertDocumentRequest request, CancellationToken ct = default)
     {
-        var validationResult = await _upsertValidator.ValidateAsync(request, ct);
-        if (!validationResult.IsValid)
+        var validationResult = await ValidateRequestAsync(_upsertValidator, request, ct);
+        if (validationResult != null)
         {
-            return ValidationFailure(validationResult.Errors.Select(x => x.ErrorMessage));
+            return validationResult;
         }
 
         try
@@ -83,21 +89,24 @@ public sealed class DocumentService : IDocumentService
         }
     }
 
+    /// <summary>
+    /// Retrieves a document from Cosmos DB.
+    /// </summary>
     public async Task<OperationResult<DocumentResponse>> GetAsync(GetDocumentRequest request, CancellationToken ct = default)
     {
-        var validationResult = await _getValidator.ValidateAsync(request, ct);
-        if (!validationResult.IsValid)
+        var validationResult = await ValidateRequestAsync(_getValidator, request, ct);
+        if (validationResult != null)
         {
-            return ValidationFailure(validationResult.Errors.Select(x => x.ErrorMessage));
+            return validationResult;
         }
 
         try
         {
             var configuration = DocumentMapper.ToCosmosConfiguration(request.Configuration!);
-            var found = await _repository.GetAsync(configuration, request.Id, request.PartitionKeyValue, ct);
+            var document = await _repository.GetAsync(configuration, request.Id, request.PartitionKeyValue, ct);
             _logger.LogInformation("Get completed for document {DocumentId}.", request.Id);
 
-            return OperationResult<DocumentResponse>.Success(DocumentMapper.ToDocumentResponse(found));
+            return OperationResult<DocumentResponse>.Success(DocumentMapper.ToDocumentResponse(document));
         }
         catch (Exception exception)
         {
@@ -105,25 +114,28 @@ public sealed class DocumentService : IDocumentService
         }
     }
 
+    /// <summary>
+    /// Updates specific fields in a Cosmos DB document.
+    /// </summary>
     public async Task<OperationResult<DocumentResponse>> PatchAsync(PatchDocumentRequest request, CancellationToken ct = default)
     {
-        var validationResult = await _patchValidator.ValidateAsync(request, ct);
-        if (!validationResult.IsValid)
+        var validationResult = await ValidateRequestAsync(_patchValidator, request, ct);
+        if (validationResult != null)
         {
-            return ValidationFailure(validationResult.Errors.Select(x => x.ErrorMessage));
+            return validationResult;
         }
 
         try
         {
             var configuration = DocumentMapper.ToCosmosConfiguration(request.Configuration!);
             var operations = DocumentMapper.ToPatchOperations(request.Operations);
-            var patched = await _repository.PatchAsync(configuration, request.Id, request.PartitionKeyValue, operations, ct);
+            var document = await _repository.PatchAsync(configuration, request.Id, request.PartitionKeyValue, operations, ct);
             _logger.LogInformation(
                 "Patch completed for document {DocumentId} with {OperationCount} operations.",
                 request.Id,
                 request.Operations.Count);
 
-            return OperationResult<DocumentResponse>.Success(DocumentMapper.ToDocumentResponse(patched));
+            return OperationResult<DocumentResponse>.Success(DocumentMapper.ToDocumentResponse(document));
         }
         catch (Exception exception)
         {
@@ -157,5 +169,22 @@ public sealed class DocumentService : IDocumentService
                 "An unexpected error occurred while processing the request.",
                 "UNEXPECTED_ERROR")
         };
+    }
+
+    /// <summary>
+    /// Validates a request and returns a failure result if validation fails.
+    /// </summary>
+    /// <returns>Null if validation succeeds, otherwise a failure result.</returns>
+    private async Task<OperationResult<DocumentResponse>?> ValidateRequestAsync<T>(
+        IValidator<T> validator,
+        T request,
+        CancellationToken ct) where T : class
+    {
+        var validationResult = await validator.ValidateAsync(request, ct);
+        if (!validationResult.IsValid)
+        {
+            return ValidationFailure(validationResult.Errors.Select(x => x.ErrorMessage));
+        }
+        return null;
     }
 }

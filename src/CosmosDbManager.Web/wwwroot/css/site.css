@@ -1,5 +1,19 @@
+:root {
+  --bg: #07111f;
+  --bg-soft: #101d33;
+  --panel: rgba(12, 20, 34, 0.88);
+  --panel-border: rgba(153, 189, 255, 0.14);
+  --text: #e8eefc;
+  --muted: #aab6d3;
+  --accent: #7dd3fc;
+  --accent-strong: #4f86ff;
+  --success: #1f8a70;
+  --danger: #c84c6c;
+}
+
 html {
-  font-size: 14px;
+  font-size: 15px;
+  min-height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -8,24 +22,289 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
 body {
-  margin-bottom: 60px;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(77, 129, 255, 0.24), transparent 35%),
+    radial-gradient(circle at top right, rgba(125, 211, 252, 0.18), transparent 28%),
+    linear-gradient(180deg, #07111f 0%, #0b1730 42%, #050b17 100%);
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+a {
+  color: var(--accent);
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.site-header,
+.site-footer,
+.content-frame,
+.config-panel,
+.hero-card,
+.hero-panel,
+.info-card,
+.result-panel,
+.page-simple {
+  backdrop-filter: blur(12px);
+}
+
+.site-nav {
+  background: rgba(4, 10, 22, 0.82);
+  border-bottom: 1px solid var(--panel-border);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
+}
+
+.navbar-brand {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.nav-link {
+  color: rgba(232, 238, 252, 0.82) !important;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+  color: #ffffff !important;
+}
+
+.app-shell {
+  position: relative;
+}
+
+.content-frame {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.site-footer {
+  color: var(--muted);
+  border-top: 1px solid var(--panel-border);
+  background: rgba(5, 10, 20, 0.9);
+}
+
+.hero-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.9fr);
+  gap: 1.5rem;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  border: 1px solid var(--panel-border);
+  background: linear-gradient(145deg, rgba(15, 27, 46, 0.96), rgba(10, 18, 31, 0.8));
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+}
+
+.hero-panel h1,
+.page-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.8rem);
+  line-height: 1.04;
+}
+
+.hero-copy .lead,
+.page-header .lead {
+  color: var(--muted);
+  max-width: 64ch;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.hero-card,
+.info-card,
+.config-panel,
+.result-panel,
+.page-simple {
+  border: 1px solid var(--panel-border);
+  background: var(--panel);
+  border-radius: 1.25rem;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+}
+
+.hero-card {
+  padding: 1.25rem;
+}
+
+.hero-card h2 {
+  font-size: 1.15rem;
+  margin-bottom: 1rem;
+}
+
+.link-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.link-grid a {
+  display: block;
+  padding: 0.85rem 1rem;
+  border-radius: 0.95rem;
+  text-decoration: none;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.link-grid a:hover {
+  background: rgba(125, 211, 252, 0.1);
+  border-color: rgba(125, 211, 252, 0.3);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.info-card {
+  padding: 1.25rem;
+}
+
+.page-header,
+.page-simple {
+  padding: 1.5rem 1.5rem 0;
+  margin-bottom: 1.25rem;
+}
+
+.page-simple {
+  padding-bottom: 1.5rem;
+}
+
+.stack-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.config-panel,
+.result-panel {
+  padding: 1.25rem;
+}
+
+.result-success {
+  border-color: rgba(31, 138, 112, 0.45);
+  box-shadow: 0 18px 50px rgba(31, 138, 112, 0.15);
+}
+
+.result-error {
+  border-color: rgba(200, 76, 108, 0.45);
+  box-shadow: 0 18px 50px rgba(200, 76, 108, 0.15);
+}
+
+.form-control,
+.form-select {
+  color: var(--text);
+  background-color: rgba(7, 14, 26, 0.88);
+  border-color: rgba(153, 189, 255, 0.18);
+}
+
+.form-control:focus,
+.form-select:focus {
+  color: var(--text);
+  background-color: rgba(7, 14, 26, 0.96);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.18rem rgba(125, 211, 252, 0.18);
+}
+
+.form-label {
+  color: #f0f5ff;
+}
+
+.json-editor,
+.json-view {
+  font-family: Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.9rem;
+}
+
+.json-view {
+  overflow: auto;
+  padding: 1rem;
+  margin: 0;
+  min-height: 120px;
+  color: #d6e4ff;
+  background: rgba(1, 8, 18, 0.85);
+  border: 1px solid rgba(153, 189, 255, 0.12);
+  border-radius: 0.9rem;
+}
+
+.patch-operations {
+  display: grid;
+  gap: 1rem;
+}
+
+.patch-operation-row {
+  padding: 1rem;
+  border: 1px solid rgba(153, 189, 255, 0.12);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.badge.text-bg-dark {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text) !important;
+}
+
+.alert {
+  border-radius: 1rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-strong), var(--accent));
+  border: none;
+  color: #07111f;
+  font-weight: 700;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  filter: brightness(1.05);
+  color: #07111f;
+}
+
+.btn-outline-light {
+  border-color: rgba(232, 238, 252, 0.4);
+  color: #f5f8ff;
+}
+
+.btn-outline-light:hover {
+  background: rgba(232, 238, 252, 0.12);
+}
+
+.tracking-wide {
+  letter-spacing: 0.08em;
+}
+
+.text-muted {
+  color: var(--muted) !important;
+}
+
+@media (max-width: 992px) {
+  .hero-panel,
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-panel,
+  .config-panel,
+  .result-panel,
+  .page-header,
+  .page-simple {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .hero-panel {
+    padding-top: 1.25rem;
+  }
 }

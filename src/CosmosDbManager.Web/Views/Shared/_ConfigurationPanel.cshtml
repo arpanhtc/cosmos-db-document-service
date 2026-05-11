@@ -1,0 +1,32 @@
+@model DocumentFormViewModel
+
+<section class="config-panel">
+    <div class="panel-header">
+        <div>
+            <p class="eyebrow mb-1">Cosmos DB configuration</p>
+            <h2 class="h5 mb-0">Session-backed connection details</h2>
+        </div>
+    </div>
+    <div class="row g-3 mt-1">
+        <div class="col-12">
+            <label asp-for="Configuration.ConnectionString" class="form-label"></label>
+            <input asp-for="Configuration.ConnectionString" class="form-control" />
+            <span asp-validation-for="Configuration.ConnectionString" class="text-danger small"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Configuration.DatabaseName" class="form-label"></label>
+            <input asp-for="Configuration.DatabaseName" class="form-control" />
+            <span asp-validation-for="Configuration.DatabaseName" class="text-danger small"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Configuration.ContainerName" class="form-label"></label>
+            <input asp-for="Configuration.ContainerName" class="form-control" />
+            <span asp-validation-for="Configuration.ContainerName" class="text-danger small"></span>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Configuration.PartitionKey" class="form-label"></label>
+            <input asp-for="Configuration.PartitionKey" class="form-control" />
+            <span asp-validation-for="Configuration.PartitionKey" class="text-danger small"></span>
+        </div>
+    </div>
+</section>

@@ -1,8 +1,41 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="hero-panel">
+    <div class="hero-copy">
+        <p class="eyebrow">Cosmos DB document workspace</p>
+        <h1>Inspect, insert, upsert, get, and patch documents from one place.</h1>
+        <p class="lead">
+            Keep Cosmos DB configuration in session, move quickly through the document flows, and switch to Swagger when you want to call the API directly.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-primary btn-lg" asp-controller="Document" asp-action="Insert">Start with Insert</a>
+            <a class="btn btn-outline-light btn-lg" asp-controller="Configuration" asp-action="Index">Set Configuration</a>
+        </div>
+    </div>
+    <div class="hero-card">
+        <h2>Quick links</h2>
+        <div class="link-grid">
+            <a asp-controller="Document" asp-action="Upsert">Upsert document</a>
+            <a asp-controller="Document" asp-action="Get">Read document</a>
+            <a asp-controller="Document" asp-action="Patch">Patch document</a>
+            <a href="/swagger">Open Swagger</a>
+        </div>
+    </div>
+</section>
+
+<section class="dashboard-grid mt-4">
+    <article class="info-card">
+        <h3>Session-backed configuration</h3>
+        <p>Store Cosmos DB connection details once and reuse them across the document pages without copy-pasting secrets into the browser.</p>
+    </article>
+    <article class="info-card">
+        <h3>Thin controllers</h3>
+        <p>Each action maps a form model to an application request and hands work off to the service layer.</p>
+    </article>
+    <article class="info-card">
+        <h3>REST API</h3>
+        <p>Programmatic endpoints mirror the UI operations and return the shared operation result contract.</p>
+    </article>
+</section>

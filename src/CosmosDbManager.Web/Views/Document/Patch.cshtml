@@ -1,0 +1,115 @@
+@model PatchDocumentViewModel
+@{
+    ViewData["Title"] = "Patch Document";
+    var operations = Model.Operations?.ToList() ?? new List<PatchOperationViewModel>();
+    if (operations.Count == 0)
+    {
+        operations.Add(new PatchOperationViewModel());
+    }
+}
+
+<section class="page-header">
+    <p class="eyebrow">Document workflow</p>
+    <h1>Patch document</h1>
+    <p class="lead">Build a dynamic JSON patch request directly in the browser.</p>
+</section>
+
+<form asp-action="Patch" method="post" class="stack-form">
+    @Html.AntiForgeryToken()
+    <partial name="_ValidationSummary" />
+    <partial name="_ConfigurationPanel" model="Model" />
+
+    <section class="config-panel">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label asp-for="Id" class="form-label"></label>
+                <input asp-for="Id" class="form-control" />
+                <span asp-validation-for="Id" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="PartitionKeyValue" class="form-label"></label>
+                <input asp-for="PartitionKeyValue" class="form-control" />
+                <span asp-validation-for="PartitionKeyValue" class="text-danger small"></span>
+            </div>
+        </div>
+    </section>
+
+    <section class="config-panel">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div>
+                <p class="eyebrow mb-1">Patch operations</p>
+                <h2 class="h5 mb-0">Add, set, replace, remove, or increment fields</h2>
+            </div>
+            <button type="button" class="btn btn-outline-primary" data-add-operation>+ Add operation</button>
+        </div>
+
+        <div id="patch-operations" class="patch-operations" data-patch-operations>
+            @for (var index = 0; index < operations.Count; index++)
+            {
+                <div class="patch-operation-row" data-patch-row>
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label asp-for="Operations[index].OperationType" class="form-label"></label>
+                            <select asp-for="Operations[index].OperationType" class="form-select" data-operation-type>
+                                <option value="Add">Add</option>
+                                <option value="Set">Set</option>
+                                <option value="Replace">Replace</option>
+                                <option value="Remove">Remove</option>
+                                <option value="Increment">Increment</option>
+                            </select>
+                            <span asp-validation-for="Operations[index].OperationType" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Operations[index].Path" class="form-label"></label>
+                            <input asp-for="Operations[index].Path" class="form-control" data-operation-path />
+                            <span asp-validation-for="Operations[index].Path" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4" data-value-wrap>
+                            <label asp-for="Operations[index].Value" class="form-label"></label>
+                            <input asp-for="Operations[index].Value" class="form-control" data-operation-value />
+                            <span asp-validation-for="Operations[index].Value" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-1 d-grid">
+                            <button type="button" class="btn btn-outline-danger" data-remove-operation>Remove</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <template id="patch-operation-template">
+            <div class="patch-operation-row" data-patch-row>
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label">Operation Type</label>
+                        <select class="form-select" data-operation-type>
+                            <option value="Add">Add</option>
+                            <option value="Set">Set</option>
+                            <option value="Replace">Replace</option>
+                            <option value="Remove">Remove</option>
+                            <option value="Increment">Increment</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Path</label>
+                        <input class="form-control" data-operation-path />
+                    </div>
+                    <div class="col-md-4" data-value-wrap>
+                        <label class="form-label">Value</label>
+                        <input class="form-control" data-operation-value />
+                    </div>
+                    <div class="col-md-1 d-grid">
+                        <button type="button" class="btn btn-outline-danger" data-remove-operation>Remove</button>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </section>
+
+    <div class="d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primary">Apply Patch</button>
+        <a class="btn btn-outline-secondary" asp-controller="Document" asp-action="Get">Go to Get</a>
+    </div>
+</form>
+
+<partial name="_OperationResult" model="Model.Result" />
